@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  konakart:
+    image: chiabre/konakart_jmx_exporter:latest
+    environment:
+      JAVA_OPTS: "-Xmx1024M"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2048M
+        reservations:
+          cpus: '1.5'
+          memory: 2048M
+    ports:
+    - 9404:9404
+    - 8780:8780
+    - 8783:8783
+    networks:
+    - akamas_lab
+
+networks:
+  akamas_lab:
+    external: true
+    name: akamas_lab

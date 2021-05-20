@@ -1,0 +1,71 @@
+version: '3.8'
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    ports:
+    - 9090:9090
+    networks:
+    - akamas_lab
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+    - prom_data:/prometheus
+    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  node:
+    image: prom/node-exporter:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    # ports:
+    # - 9001:9100
+    networks:
+    - akamas_lab
+
+  cadvisor:
+    image: google/cadvisor:latest
+    deploy:
+    # ports:
+    # - 9002:8080
+    networks:
+    - akamas_lab
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    # entrypoint:
+    # - "/usr/bin/cadvisor"
+    # - "-logtostderr"
+    # - "--allow_dynamic_housekeeping=false"
+    # - "--housekeeping_interval=5s"
+
+  grafana:
+    image: grafana/grafana:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    ports:
+    - 3000:3000
+    networks:
+    - akamas_lab
+    volumes:
+    - grafana_data:/var/lib/grafana
+    - ./grafana/provisioning/:/etc/grafana/provisioning/
+
+volumes:
+  prom_data:
+  grafana_data:
+networks:
+  akamas_lab:
+    external: true
+    name: akamas_lab
